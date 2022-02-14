@@ -27,6 +27,8 @@ class Note extends FlxSprite
 	public var editorBFNote:Bool = false;
 	public var absoluteNumber:Int;
 
+	public var editor = false;
+
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
@@ -46,8 +48,10 @@ class Note extends FlxSprite
 		x += 100;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
+
+		editor = _editor;
 		
-		if(!_editor){
+		if(!editor){
 			strumTime = _strumTime + Config.offset;
 			if(strumTime < 0) {
 				strumTime = 0;
@@ -196,7 +200,7 @@ class Note extends FlxSprite
 		if (mustPress)
 		{
 			if(isSustainNote){
-				canBeHit = (strumTime < Conductor.songPosition + Conductor.safeZoneOffset * 0.125);
+				canBeHit = (strumTime < Conductor.songPosition + Conductor.safeZoneOffset * 1 && (prevNote == null ? true : prevNote.wasGoodHit));
 			}
 			else{
 				canBeHit = (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
@@ -213,17 +217,17 @@ class Note extends FlxSprite
 
 			if (strumTime <= Conductor.songPosition)
 			{
-				wasGoodHit = true;
+				canBeHit = true;
 			}
 		}
 
 		//Glow note stuff.
 
-		if (canBeHit && Config.noteGlow && !isSustainNote && animation.curAnim.name.contains("Scroll")){
+		if (canBeHit && Config.noteGlow && !isSustainNote && !editor && animation.curAnim.name.contains("Scroll")){
 			glow();
 		}
 
-		if (tooLate && !isSustainNote && !animation.curAnim.name.contains("Scroll")){
+		if (tooLate && !isSustainNote && !editor && !animation.curAnim.name.contains("Scroll")){
 			idle();
 		}
 
